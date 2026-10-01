@@ -40,3 +40,12 @@ def get_tools_schema(tools):
         })
    
     return schemas
+
+@tool
+def write_file(path: str, content: str):
+    """
+    Membuat file baru atau memperbarui isi file yang sudah ada di workspace.
+    
+    Gunakan tool ini ketika kode perlu ditambahkan, diperbaiki, atau diubah.
+    Pastikan path file sesuai dengan file yang ingin dimodifikasi.
+    """

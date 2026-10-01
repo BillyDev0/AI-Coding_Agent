@@ -8,23 +8,17 @@ mapping_tools={
 
 
 class StepState(BaseModel):
-    step_number: int
+    goal:str
     tools: str
     query: str
     args: dict[str, Any]
     status: Literal["success", "failed"]
     result: Any = None
-    error: Any = None
+    error: str | None = None
 
-class Executor_State(BaseModel):
-    goal:str
-    step_state:list[StepState]
-    total_steps: int
 
 def executor_tools(plan):
-    state_step=[]
-
-    for i,item in enumerate(plan.steps,start=1):
+    for item in plan.steps:
         tools=item.tools
         query_plan=item.query
         args=item.args
@@ -43,8 +37,8 @@ def executor_tools(plan):
             status='success'
             error=None
 
-        state=StepState(
-                step_number=i,
+        return StepState(
+                goal=plan.goal,
                 tools=tools,
                 query=query_plan,
                 args=args,
@@ -53,12 +47,6 @@ def executor_tools(plan):
                 error=error
             )
 
-        state_step.append(state)
 
-    return Executor_State(
-        goal=plan.goal,
-        step_state=state_step,
-        total_steps=len(plan.steps)
-    )
-
+    
           
