@@ -4,4 +4,4 @@ while True:
     calculator()
     lanjut=input("Lanjut (y/n): ")
     if lanjut=='n':
-        break
+        bre

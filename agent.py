@@ -1,18 +1,20 @@
 from planner import planner
 from executor_tools import executor_tools
-from tools import read_file
+from tools import read_file,write_file
 from evaluator import evaluator
 from logger import logger
 
 tools=[
-    read_file
+    read_file,
+    write_file
 ]
 
 
 def main(prompt):
     history_plan=[]
 
-    while True:
+    iterasi=0
+    while iterasi<=5:
         plan=planner(prompt,history_plan,tools)
         logger.info(f"OUTPUT PLANNER: {plan}")
         history_plan.append(plan)
@@ -26,6 +28,7 @@ def main(prompt):
         if feedback_evaluator.status=="done":
            result=feedback_evaluator.final_result
            break
+        iterasi+=1
 
     return result
             

@@ -49,3 +49,22 @@ def write_file(path: str, content: str):
     Gunakan tool ini ketika kode perlu ditambahkan, diperbaiki, atau diubah.
     Pastikan path file sesuai dengan file yang ingin dimodifikasi.
     """
+
+    PROJECT_ROOT = Path("project_test").resolve()
+    target_path=(PROJECT_ROOT/path).resolve()
+
+    if not target_path.is_relative_to(PROJECT_ROOT):
+        return f"ERROR: path '{path}' berada di luar project root yang diizinkan"
+
+    if not target_path.exists():
+        return f"ERROR: file '{path}' tidak ditemukan."
+
+    if not target_path.is_file():
+        return f"ERROR: '{path}' bukan file."
+    
+    try:
+        with open(target_path,"w") as f:
+            f.write(content)
+    except Exception as e:
+        return f"ERROR: {e}"
+    
