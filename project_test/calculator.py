@@ -9,15 +9,18 @@ def calculator():
         return a * b
 
     def bagi(a, b):
-        return a / b
+        return a / b if b != 0 else "Error: Pembagian dengan nol"
 
-    print("Calculator")
+    print("=========================")
+    print("   KALKULATOR SEDERHANA  ")
+    print("=========================")
     print("1. Tambah")
     print("2. Kurang")
     print("3. Kali")
     print("4. Bagi")
+    print("=========================")
 
-    pilihan = input("Pilih operasi: ")
+    pilihan = input("Pilih operasi (1, 2, 3, atau 4): ")
     a = float(input("Angka pertama: "))
     b = float(input("Angka kedua: "))
 

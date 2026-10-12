@@ -1,5 +1,7 @@
 from langchain_core.tools import tool
 from pathlib import Path
+import os
+
 @tool
 def read_file(path:str):
     """Read the contents of a specified file from the project so the agent can inspect its code.
@@ -28,19 +30,6 @@ Description:
     except UnicodeDecodeError:
         return f"ERROR: file '{path}' tidak bisa dibaca sebagai teks (kemungkinan binary)."
 
-
-def get_tools_schema(tools):
-    schemas = []
-
-    for tool in tools:
-        schemas.append({
-            "name": tool.name,
-            "description": tool.description,
-            "args_schema": tool.args_schema.model_json_schema()
-        })
-   
-    return schemas
-
 @tool
 def write_file(path: str, content: str):
     """
@@ -65,6 +54,29 @@ def write_file(path: str, content: str):
     try:
         with open(target_path,"w") as f:
             f.write(content)
+
+        return target_path.read_text()
     except Exception as e:
         return f"ERROR: {e}"
+
     
+def get_tools_schema(tools):
+    schemas = []
+
+    for tool in tools:
+        schemas.append({
+            "name": tool.name,
+            "description": tool.description,
+            "args_schema": tool.args_schema.model_json_schema()
+        })
+   
+    return schemas
+
+
+def list_files(path: str = ".") -> str:
+    hasil = []
+
+    for nama in os.listdir(path):
+        hasil.append(nama)
+
+    return "\n".join(hasil)
