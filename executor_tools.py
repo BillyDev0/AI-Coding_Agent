@@ -13,7 +13,7 @@ class StepState(BaseModel):
     tools: str
     query: str
     args: dict[str, Any]
-    status: Literal["success"]
+    status: Literal["success","failed"]
     result: Any = None
     error: str | None = None
 
@@ -35,8 +35,9 @@ def executor_tools(plan):
 
         if "ERROR" in result_tools:
             error=result_tools
-            return error
-
+            status='failed'
+            result_state=None
+            
         else:
             result_state=result_tools
             status='success'
