@@ -90,7 +90,7 @@ load_dotenv()
 
 
 def evaluator(step_state,tools,history_evaluator=None):
-    daftar_files=list_files('project_test')
+    daftar_files=list_files()
     set_model=ChatGoogleGenerativeAI(
         model="gemini-3.1-flash-lite",
         temperature=0.2,

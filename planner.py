@@ -19,7 +19,7 @@ class PlannerOutput(BaseModel):
 load_dotenv()
 
 def planner(goal,history,tools,feedback=None,result_tools=None):
-    daftar_files=list_files('project_test')
+    daftar_files=list_files()
     
     schema_tools=get_tools_schema(tools)
     set_model=ChatGoogleGenerativeAI(model="gemini-3.1-flash-lite",

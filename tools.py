@@ -14,8 +14,8 @@ Description:
 
 Tujuan: memberikan konteks kode yang cukup untuk analisis tanpa mengirimkan isi file yang tidak diperlukan.
 """
-    PROJECT_ROOT = Path("project_test").resolve()
-    target_path=(PROJECT_ROOT/path).resolve()
+    PROJECT_ROOT=Path.cwd()
+    target_path=Path(path).resolve()
 
     if not target_path.is_relative_to(PROJECT_ROOT):
         return f"ERROR: path '{path}' berada di luar project root yang diizinkan"
@@ -51,8 +51,8 @@ Aturan perubahan:
   - `"execution code"`: Memperbarui kode yang sudah ada dan mengembalikan hasil perubahan sesuai goal user.
 """
 
-    PROJECT_ROOT = Path("project_test").resolve()
-    target_path=(PROJECT_ROOT/path).resolve()
+    PROJECT_ROOT = Path.cwd()
+    target_path=Path(path).resolve()
 
     if kebutuhan == "execution code":
         if not target_path.is_relative_to(PROJECT_ROOT):
@@ -87,10 +87,17 @@ def get_tools_schema(tools):
     return schemas
 
 
-def list_files(path: str = ".") -> str:
+def list_files() -> str:
+    path=Path.cwd().resolve()
     hasil = []
 
-    for nama in os.listdir(path):
-        hasil.append(nama)
+    for root, dirs, files in os.walk(path):
+        dirs[:] = [d for d in dirs if d not in {".git", "__pycache__", ".venv"}]
+
+        for nama in dirs:
+            hasil.append(os.path.join(root, nama) + "/")
+
+        for nama in files:
+            hasil.append(os.path.join(root, nama))
 
     return "\n".join(hasil)

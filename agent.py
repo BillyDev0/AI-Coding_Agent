@@ -16,8 +16,8 @@ def main():
     list_feedback=[]
     list_result_tools=[]
     while True:
-        prompt=input('masukan prompt (ketik "close" jika sudah): ')
-        if prompt == 'close':
+        prompt=input('masukan prompt (ketik "quit" jika sudah): ')
+        if prompt == 'quit':
             print('PROGRAM SELESAI')
             break
         while iterasi<=5:
