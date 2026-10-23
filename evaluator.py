@@ -100,8 +100,12 @@ def evaluator(step_state,tools,history_evaluator=None):
 
     prompt=ChatPromptTemplate.from_template(template)
     chain=prompt|model
-    result=chain.invoke({"step_state":step_state,'history_evaluator':history_evaluator,'list_file':daftar_files})
-    return result
+    try:
+        result=chain.invoke({"step_state":step_state,'history_evaluator':history_evaluator,'list_file':daftar_files})
+        return result
+    except TimeoutError:
+            return f"ERROR: sistem Timeout dan coba lagi beberapa saat"
+
 
 
 

@@ -29,7 +29,7 @@ def planner(goal,history,tools,feedback=None,result_tools=None):
     model=set_model.with_structured_output(PlannerOutput)
 
     
-    template = """Kamu adalah Planner Agent untuk Coding Agent.
+    template = """Kamu adalah Planner gent untuk Coding Agent.
 
 Tugasmu menyusun langkah Executor berdasarkan tujuan user, hasil tools, riwayat langkah, dan feedback Evaluator. Kamu tidak mengeksekusi tools atau mengubah kode sendiri.
 
@@ -130,6 +130,10 @@ List File:
 
     prompt=ChatPromptTemplate.from_template(template)
     chain=prompt|model
-    result=chain.invoke({"goal":goal,"history":history,"feedback":feedback,"schema_tools":schema_tools,"output_tools":result_tools,'list_file':daftar_files})
-    return result
+    try:
+        result=chain.invoke({"goal":goal,"history":history,"feedback":feedback,"schema_tools":schema_tools,"output_tools":result_tools,'list_file':daftar_files})
+        return result
+    
+    except TimeoutError:
+        return f"ERROR: sistem Timeout dan coba lagi beberapa saat"
 
