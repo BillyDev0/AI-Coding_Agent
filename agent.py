@@ -1,72 +1,36 @@
 from planner import planner
 from executor_tools import executor_tools
-from tools import read_file,write_file
+from tools import read_file,write_file,chatbot
 from evaluator import evaluator
 from logger import logger
-from langchain_ollama import OllamaLLM
+from langchain_ollama import ChatOllama
 from langchain_core.prompts import ChatPromptTemplate
 
 tools=[
     read_file,
-    write_file
+    write_file,
+    chatbot
 ]
 
+def straming_model(output,source):
+    template = """Kamu adalah asisten yang menjawab pengguna secara natural, sederhana, dan langsung ke inti.
 
-def run_agent():
-    history_plan=[]
-    list_feedback=[]
-    list_result_tools=[]
-    iterasi=0
-    while True:
-        try:
-            prompt=input('masukan prompt (ketik "quit" jika sudah): ')
-            if prompt == 'quit':
-                print('PROGRAM SELESAI')
-                break
-            if prompt == '':
-                continue
+Aturan:
+1. Jika menerima output program, jelaskan artinya dengan bahasa yang mudah dipahami tanpa mengarang informasi.
+2. Hindari kalimat kaku seperti "Berdasarkan output tersebut" atau "Dari program tersebut dapat disimpulkan".
+3. Jangan menebak fakta yang tidak tersedia.
+4. Jika output berasal dari tools chatbot, teruskan output tersebut kepada pengguna tanpa mengubah, menjelaskan ulang, atau menambahkan respons apa pun.
+5. Jika sumber output tidak diketahui, perlakukan sebagai output program biasa.
 
-            while iterasi<=5:
-                feedback_evaluator= list_feedback if list_feedback else None
-                result_tools= list_result_tools if list_result_tools else None
+Sumber output:
+{source}
 
-                plan=planner(prompt,history_plan,tools,feedback_evaluator,result_tools)
-                history_plan.append(plan)
-                logger.info(f"OUTPUT PLANNER: {plan}")
+Output:
+{output}
 
-                step_state=executor_tools(plan)
-                list_result_tools.append(step_state)
-                logger.info(f"STATE STEP: {step_state}")
+Jawab sesuai aturan di atas."""
 
-                result_evaluator=evaluator(step_state,tools,list_feedback)
-                list_feedback.append(result_evaluator)
-                logger.info(f"OUTPUT EVALUATOR: {result_evaluator}")
-
-                if result_evaluator.status=="done":
-                    result=result_evaluator.final_result
-                    print(result)
-                    iterasi=0
-                    break
-                while len(list_result_tools) >= 4:
-                    list_result_tools.pop(0)
-
-                iterasi+=1
-
-            else:
-                print("Gagal menyelesaikan instruksi setelah N iterasi")
-        except KeyboardInterrupt:
-                    print("Program dihentikan oleh pengguna melalui keyboard.")
-
-def straming_model(output):
-    template="""Jelaskan output program berikut kepada pengguna.
-Gunakan hanya informasi yang tersedia.
-Jangan menebak penyebab, status, atau detail yang tidak disebutkan.
-Jika informasinya tidak cukup, katakan bahwa informasi tersebut tidak tersedia.
-
-Output program:
-{output}"""
-
-    set_model=OllamaLLM(
+    set_model=ChatOllama(
              model="qwen2.5:7b",
              temperature=0.1,
              top_p=0.1,
@@ -74,21 +38,71 @@ Output program:
     prompt=ChatPromptTemplate.from_template(template)
 
     chain=prompt|set_model
-    for chunk in chain.stream({'output':output}):
-         print(chunk, end='', flush=True)
+    for chunk in chain.stream({'output':output,'source':source}):
+        print(chunk.content, end="", flush=True)
+
+    print()
+
+
+def run_agent(prompt):
+    history_plan=[]
+    list_feedback=[]
+    list_result_tools=[]
+    iterasi=0
+   
+
+    while iterasi<=5:
+        feedback_evaluator= list_feedback if list_feedback else None
+        result_tools= list_result_tools if list_result_tools else None
+
+        plan=planner(prompt,history_plan,tools,feedback_evaluator,result_tools)
+        history_plan.append(plan)
+        logger.info(f"OUTPUT PLANNER: {plan}")
+
+        step_state=executor_tools(plan)
+        list_result_tools.append(step_state)
+        logger.info(f"STATE STEP: {step_state}")
+        for i in step_state.step_state:
+             if i.tools=='chatbot':
+                  return i.result,"chatbot"
+
+        result_evaluator=evaluator(step_state,tools,list_feedback)
+        list_feedback.append(result_evaluator)
+        logger.info(f"OUTPUT EVALUATOR: {result_evaluator}")
+
+        if result_evaluator.status=="done":
+            result=result_evaluator.final_result
+            iterasi=0
+            return result,"program"
+        
+        while len(list_result_tools) >= 4:
+            list_result_tools.pop(0)
+
+        iterasi+=1
+
+    else:
+        iterasi=0
+        return "Gagal menyelesaikan instruksi setelah N iterasi","program"
+
     
     
-def handle_streaming(chunk):
-    for chunks in chunk:
-         print(chunks)
-     
 def main():
-    result_agent=run_agent()
-    streaming=straming_model(result_agent)
-    handle_streaming(streaming)
+    while True:
+            try:
+                prompt=input('masukan prompt (ketik "quit" jika sudah): ')
+                if prompt == 'quit':
+                    print('PROGRAM SELESAI')
+                    break
+                if prompt == '':
+                    continue
+
+                result_agent,source=run_agent(prompt)
+                straming_model(result_agent,source)
+
+            except KeyboardInterrupt:
+                print("Program dihentikan oleh pengguna melalui keyboard.")
     
-
-
 
 if __name__=="__main__":
         main()
+

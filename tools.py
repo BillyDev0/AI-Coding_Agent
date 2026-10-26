@@ -1,7 +1,8 @@
 from langchain_core.tools import tool
 from pathlib import Path
 import os
-from typing import Literal
+from langchain_google_genai import GoogleGenerativeAI
+from langchain_core.prompts import ChatPromptTemplate
 
 @tool
 def read_file(path:str):
@@ -73,7 +74,39 @@ Aturan perubahan:
     except Exception as e:
         return f"ERROR: {e}"
 
+@tool
+def chatbot(goal:str):
+    """
+Gunakan tools ini untuk menangani sapaan dan percakapan ringan dengan user.
+'goal'= berisi prompt user ke agent, bukan hal lain.
+"""
+
+    template = """Kamu adalah tools chatbot untuk AI Coding Agent.
+
+Tugas:
+1. Menanggapi sapaan pengguna secara natural dan ramah.
+2. Menjawab percakapan ringan yang masih berkaitan dengan AI Coding Agent.
+3. Menolak pertanyaan yang tidak berkaitan dengan AI Coding Agent, pemrograman, atau penggunaan tools agent.
+4. Jika pertanyaan di luar konteks, jelaskan secara singkat bahwa pertanyaan tersebut di luar ruang lingkup tugasmu dan arahkan pengguna kembali ke AI Coding Agent.
+5. Jangan menjawab pertanyaan di luar konteks, meskipun kamu mengetahui jawabannya.
+6. Gunakan bahasa yang sederhana, natural, dan langsung ke inti.
+7. Jangan mengarang informasi atau mengklaim kemampuan yang tidak dimiliki.
+
+Pesan pengguna:
+{input}
+
+Berikan respons sesuai aturan di atas."""
+
+    set_model=GoogleGenerativeAI(
+             model="gemini-3.1-flash-lite"
+         )
+    prompt=ChatPromptTemplate.from_template(template)
+
+    chain=prompt|set_model
+    result=chain.invoke({'input':goal})
+    return result
     
+
 def get_tools_schema(tools):
     schemas = []
 

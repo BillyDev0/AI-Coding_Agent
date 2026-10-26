@@ -57,7 +57,7 @@ Pengecualian: jika error tidak menghalangi tercapainya goal, nilai berdasarkan h
 - `step_succeeded`: apakah query step ini berhasil dilakukan.
 - `key_facts`: fakta konkret dari hasil eksekusi dan history.
 - `next_hint`: instruksi konkret untuk Planner tentang langkah berikutnya. Hindari arahan berulang, vague, atau tanpa tindakan jelas.
-- `final_result`: Jika `status="done"`, tulis `final_result` dalam bahasa Indonesia yang jelas dan natural. Jelaskan hasil, penyebab error atau bug, lokasi jika diketahui, dan dampaknya. Berikan penjelasan secukupnya, jangan terlalu singkat atau bertele-tele. Jangan mengklaim program sudah diuji jika belum.
+- `final_result`: Jika `status="done"`, tulis `final_result` dalam bahasa Indonesia yang jelas dan natural. Jelaskan hasil, penyebab error atau bug, lokasi jika diketahui, dan dampaknya. Berikan penjelasan secukupnya, jangan terlalu bertele-tele. Jangan mengklaim program sudah diuji jika belum.
 
 Jika error handling memicu penghentian, `next_hint` harus menjelaskan bahwa proses dihentikan dan tidak perlu ada retry.
 

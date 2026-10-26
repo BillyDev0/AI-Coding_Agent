@@ -7,7 +7,7 @@ from tools import get_tools_schema,list_files
 from dotenv import load_dotenv
 
 class Step(BaseModel):
-    tools:Literal['read_file','write_file']
+    tools:Literal['read_file','write_file','chatbot']
     query: str
     args:dict[str,Any]
 
@@ -89,13 +89,6 @@ Jangan membuat kesimpulan tentang isi kode yang tidak didukung hasil tools.
 3. Urutkan step berdasarkan dependensi.
 4. Jika step berikutnya bergantung pada hasil step yang belum dijalankan, hentikan plan pada step tersebut dan tunggu Evaluator.
 5. Jangan membuat step dengan query yang sudah ada di riwayat, kecuali ada alasan baru yang jelas dan pendekatannya berbeda.
-
-## PENGGUNAAN READ_FILE
-
-- Baca seluruh isi file saat pertama kali memeriksa file yang relevan dan struktur kodenya belum dipahami.
-- Gunakan `start_line` dan `end_line` jika lokasi kode sudah diketahui dan hanya bagian tertentu yang diperlukan.
-- Jika potongan kode tidak cukup untuk memahami masalah, perluas rentang atau baca seluruh file.
-- Manfaatkan hasil pembacaan sebelumnya jika masih tersedia dan relevan.
 
 ## TOOL DAN ARGS
 

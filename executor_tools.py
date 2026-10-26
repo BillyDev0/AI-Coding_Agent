@@ -1,10 +1,11 @@
-from tools import read_file,write_file
+from tools import read_file,write_file,chatbot
 from typing import Literal,Any
 from pydantic import BaseModel
 
 mapping_tools={
     "read_file":read_file,
-    "write_file":write_file
+    "write_file":write_file,
+    "chatbot":chatbot
 }
 
 
