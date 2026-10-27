@@ -89,13 +89,13 @@ class Schema_Evaluator(BaseModel):
 load_dotenv()
 
 
-def evaluator(step_state,tools,history_evaluator=None):
+def evaluator(step_state,history_evaluator=None):
     daftar_files=list_files()
     set_model=ChatGoogleGenerativeAI(
         model="gemini-3.1-flash-lite",
         temperature=0.2,
         top_p=0.1,
-    ).bind_tools(tools)
+    )
     model=set_model.with_structured_output(Schema_Evaluator)
 
     prompt=ChatPromptTemplate.from_template(template)
