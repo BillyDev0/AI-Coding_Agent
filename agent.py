@@ -5,6 +5,7 @@ from evaluator import evaluator
 from logger import logger
 from langchain_ollama import ChatOllama
 from langchain_core.prompts import ChatPromptTemplate
+from AUTH.jwt_auth import verif_token
 
 tools=[
     read_file,
@@ -44,7 +45,12 @@ Jawab sesuai aturan di atas."""
     print()
 
 
-def run_agent(prompt,list_result_tools):
+def run_agent(token,prompt,list_result_tools):
+
+    cek_token=verif_token(token)
+    if cek_token is None:
+        return "token anda mengalami masalah",None
+    
     history_plan=[]
     list_feedback=[]
     iterasi=0
@@ -72,38 +78,12 @@ def run_agent(prompt,list_result_tools):
         if result_evaluator.status=="done":
             result=result_evaluator.final_result
             return result,"program"
-        
-        while len(list_result_tools) >= 4:
-            list_result_tools.pop(0)
 
         iterasi+=1
+        while len(list_result_tools) > 4:
+            list_result_tools.pop(0)
+
 
     else:
         return "Gagal menyelesaikan instruksi setelah N iterasi","program"
-
-    
-    
-def main():
-    while True:
-            list_result_tools=[]
-            try:
-                prompt=input('masukan prompt (ketik "quit" jika sudah): ')
-                if prompt == 'quit':
-                    print('PROGRAM SELESAI')
-                    break
-                if prompt == '':
-                    continue
-
-                result_agent,source=run_agent(prompt,list_result_tools)
-                straming_model(result_agent,source)
-
-            except KeyboardInterrupt:
-                print("Program dihentikan oleh pengguna melalui keyboard.")
-
-            except EOFError:
-                print("Input tidak tersedia.")
-    
-
-if __name__=="__main__":
-        main()
 
